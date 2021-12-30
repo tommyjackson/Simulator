@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import com.tjackapps.simulator.desktop.simulation.simulator.SimulationObject
 import com.tjackapps.simulator.desktop.simulation.simulator.Simulator
@@ -24,14 +25,6 @@ fun BoxScope.SimulatorComponent(
     coroutineScope: CoroutineScope,
     scaleMultiplier: Float,
 ) {
-//    Box(
-//        modifier = modifier
-//            .simulatorComponent(
-//                simulator = simulator,
-//                coroutineScope = coroutineScope,
-//                scaleMultiplier = scaleMultiplier,
-//            )
-//    )
 //    val scrollState = rememberScrollState()
 
     SimulatorCanvas(
@@ -51,6 +44,8 @@ fun SimulatorCanvas(
     coroutineScope: CoroutineScope,
     scaleMultiplier: Float,
 ) {
+    val density = LocalDensity.current
+
     // setup simulation loop
     LaunchedEffect(Unit) {
         var lastTime = 0L
@@ -58,8 +53,8 @@ fun SimulatorCanvas(
             withFrameNanos {
                 if (lastTime != 0L) {
                     val periodNanos = it - lastTime
-                    val periodMillis = (periodNanos / 1E8).toFloat()
-                    simulator.updateSimulation(periodMillis)
+                    val periodMillis = (periodNanos / 1E6).toFloat()
+                    simulator.updateSimulation(periodMillis, density)
                 }
                 lastTime = it
             }
@@ -70,7 +65,6 @@ fun SimulatorCanvas(
 
     Canvas(
         modifier = modifier
-//        modifier = Modifier
             .width(1200.dp)
             .height(800.dp),
     ) {
@@ -81,44 +75,5 @@ fun SimulatorCanvas(
             val vy = (it as SimulationObject.Particle).velocity.y
             it.draw(this, scaleMultiplier, particleColor)
         }
-    }
-}
-
-fun Modifier.simulatorComponent(
-    simulator: Simulator,
-    coroutineScope: CoroutineScope,
-    scaleMultiplier: Float,
-): Modifier {
-    return composed {
-
-        // setup simulation loop
-        LaunchedEffect(Unit) {
-            var lastTime = 0L
-            while (isActive) {
-                withFrameNanos {
-                    if (lastTime != 0L) {
-                        val periodNanos = it - lastTime
-                        val periodMillis = (periodNanos / 1E8).toFloat()
-                        simulator.updateSimulation(periodMillis)
-                    }
-                    lastTime = it
-                }
-            }
-        }
-
-//    pointerInput(Unit) {
-//        // TODO
-//    }
-        val particleColor = MaterialTheme.colors.onSurface
-
-        Modifier
-//            .onSizeChanged {
-//                simulator.onSizeChanged(it)
-//            }
-            .drawBehind {
-                simulator.simulationObjects.forEach {
-                    it.draw(this, scaleMultiplier, particleColor)
-                }
-            }
     }
 }

@@ -4,6 +4,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.tjackapps.simulator.desktop.simulation.particles.ParticlesModel
@@ -45,17 +46,17 @@ class Simulator {
         )
     }
 
-    private fun populateData() {
+    private fun populateData(density: Density) {
 //        simulatorModel.updateSimulationSize(
 //            sizePixels = sizePixels,
 //        )
 
-        particlesModel.populate()
+        particlesModel.populate(density)
     }
 
-    fun startSimulation() {
+    fun startSimulation(density: Density) {
         particlesModel.reset()
-        populateData()
+        populateData(density)
         simulatorModel.startSimulation()
         println("Simulation Started")
     }
@@ -77,10 +78,11 @@ class Simulator {
 
     fun updateSimulation(
         timeElapsedMillis: Float,
+        density: Density,
     ) {
         if (status != SimulatorStatus.RUNNING) return
 
-        particlesModel.next(timeElapsedMillis)
+        particlesModel.next(timeElapsedMillis, density)
     }
 
     companion object {

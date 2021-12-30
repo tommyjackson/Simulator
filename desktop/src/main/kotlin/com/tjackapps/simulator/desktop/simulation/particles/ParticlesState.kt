@@ -1,6 +1,7 @@
 package com.tjackapps.simulator.desktop.simulation.particles
 
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
 import com.tjackapps.simulator.desktop.simulation.simulator.Multipliers
 import com.tjackapps.simulator.desktop.simulation.simulator.SimulationObject
@@ -17,12 +18,12 @@ data class ParticlesState(
 
     companion object {
 
-        fun ParticlesState.populate() : ParticlesState {
+        fun ParticlesState.populate(density: Density) : ParticlesState {
 
             val list = mutableListOf<SimulationObject.Particle>()
 
             repeat(10) {
-                list.add(SimulationObject.Particle.create())
+                list.add(SimulationObject.Particle.create(density))
             }
 
             return copy(
@@ -34,7 +35,7 @@ data class ParticlesState(
         /**
          * @param time: Time in milliseconds since last update
          */
-        fun ParticlesState.next(time: Float): ParticlesState {
+        fun ParticlesState.next(time: Float, density: Density): ParticlesState {
 //            val mapOfForcesToApply = mutableMapOf<Int, MutableList<Offset>>()
 
 //            // nested map over all particles to calculate the forces to apply
@@ -85,7 +86,7 @@ data class ParticlesState(
             return copy(
                 particles = particles.mapIndexed { index, particle ->
                     particle.next(
-                        borders = size,
+                        borderss = size,
                         durationMillis = time,
 //                        radius = particleRadius,
                         netForcesToApply = Offset.Zero,
@@ -94,6 +95,7 @@ data class ParticlesState(
 //                            println("DEBUG: Force not found at index $index in map ${summedForcesToApply.toString()}")
 //                            Offset.Zero
 //                        },
+                        density = density
                     )
                 }
             )

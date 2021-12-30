@@ -3,7 +3,9 @@ package com.tjackapps.simulator.desktop.simulation.simulator
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.dp
 
 sealed class SimulationObject {
     // how the object should be drawn on the canvas
@@ -39,37 +41,39 @@ sealed class SimulationObject {
         }
 
         companion object {
-            fun create(): Particle {
-                val w = 1200
-                val h = 800
+            fun create(density: Density): Particle {
+                with(density) {
+                    val w = 1200.dp.roundToPx()
+                    val h = 800.dp.roundToPx()
 
-                val position = Offset(
-                    (0..w).random().toFloat(),
-                    (0..h).random().toFloat()
-                )
+                    val position = Offset(
+                        (0..w).random().toFloat(),
+                        (0..h).random().toFloat()
+                    )
 
-                val velocity = Offset(
-                    // First, randomize direction. Second, randomize magnitude of velocity.
-                    listOf(
-                        -1f,
-                        1f
-                    ).random() * ((w.toFloat() / 100f).toInt()..(w.toFloat() / 10f).toInt()).random()
-                        .toFloat(),
-                    listOf(
-                        -1f,
-                        1f
-                    ).random() * ((h.toFloat() / 100f).toInt()..(h.toFloat() / 10f).toInt()).random()
-                        .toFloat()
-                )
+                    val velocity = Offset(
+                        // First, randomize direction. Second, randomize magnitude of velocity.
+                        listOf(
+                            -1f,
+                            1f
+                        ).random() * ((w.toFloat() / 100f).toInt()..(w.toFloat() / 10f).toInt()).random()
+                            .toFloat(),
+                        listOf(
+                            -1f,
+                            1f
+                        ).random() * ((h.toFloat() / 100f).toInt()..(h.toFloat() / 10f).toInt()).random()
+                            .toFloat()
+                    )
 
-                return Particle(
-                    width = 8f,
-                    height = 8f,
-                    mass = (1..10).random().toFloat(),
-                    position = position,
-                    velocity = velocity,
-                    acceleration = Offset.Zero,
-                )
+                    return Particle(
+                        width = 8f,
+                        height = 8f,
+                        mass = (1..10).random().toFloat(),
+                        position = position,
+                        velocity = velocity,
+                        acceleration = Offset.Zero,
+                    )
+                }
             }
 
             /**
@@ -80,41 +84,25 @@ sealed class SimulationObject {
             }
 
             fun Particle.next(
-                borders: IntSize,
+                borderss: IntSize,
                 durationMillis: Float,
 //                radius: Float,
                 netForcesToApply: Offset, // acceleration?
                 multipliers: Multipliers,
+                density: Density,
             ): Particle {
-                val speed = (velocity + netForcesToApply) * multipliers.speed //* 10f
-//                val vx = velocity.x
-//                val vy = velocity.y
-//                val nx = netForcesToApply.x
-//                val ny = netForcesToApply.y
-//                val sx = speed.x
-//                val sy = speed.y
-//                val px = position.x
-//                val py = position.y
+                val borders = with(density) {
+                    IntSize(1200.dp.roundToPx(), 800.dp.roundToPx())
+                }
 
+                val speed = (velocity + netForcesToApply) * multipliers.speed
                 val radius = 8 * multipliers.scale
 
-                val pos = position + Offset(
-                    x = speed.x / 1000f * durationMillis,
-                    y = speed.y / 1000f * durationMillis,
-                )
-
-//                val pos = position + Offset(
-//                    x = speed.x * durationMillis / 1000f,
-//                    y = speed.y * durationMillis / 1000f,
-//                )
-
-//                val posx = pos.x
-//                val posy = pos.y
-//
-//                val posz = pos
-
                 return Particle(
-                    position = pos,
+                    position = position + Offset(
+                        x = speed.x / 1000f * durationMillis,
+                        y = speed.y / 1000f * durationMillis,
+                    ),
                     velocity = velocity,
                     acceleration = acceleration,
                     mass = mass,
