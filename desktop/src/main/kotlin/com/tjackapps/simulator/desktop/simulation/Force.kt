@@ -6,7 +6,7 @@ import kotlin.math.pow
 sealed class Force {
 
     companion object {
-        private val GRAVITY_CONSTANT = (-6.67 * (10.0).pow(1)) //actual -(6.674 * (10.0.pow(11.0)))
+        private val GRAVITY_CONSTANT = (6.67 * (10.0).pow(-11))
     }
 
     object Gravity : Force() {
@@ -18,12 +18,15 @@ sealed class Force {
             objectTwoMass: Float,
             multiplier: Float,
         ): Offset {
+            val displacement = (objectTwoPosition - objectOnePosition)
 
-            val distance = (objectTwoPosition - objectOnePosition)
+            val normalizedDisplacement = displacement / displacement.getDistance()
 
             val forceOfGravityOnObjectOne =
-                (GRAVITY_CONSTANT * multiplier) * ((objectOneMass * objectTwoMass) / ((distance).getDistance().pow(2)))
-            return objectOnePosition.div(forceOfGravityOnObjectOne.toFloat())
+                (GRAVITY_CONSTANT * 10f.pow(multiplier)) * ((objectOneMass * objectTwoMass) / (displacement.getDistance().pow(2)))
+            return normalizedDisplacement * forceOfGravityOnObjectOne.toFloat()
+
+            // TODO find way to define or customize how multiplier is applied here  (GRAVITY_CONSTANT * 10f.pow(multiplier))
         }
     }
 

@@ -8,10 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.tjackapps.simulator.desktop.ui.SimulatorTypography
-import java.math.BigDecimal.ROUND_HALF_UP
 import java.math.RoundingMode
-import kotlin.math.round
-import kotlin.math.roundToInt
 
 @Composable
 fun SliderRow(

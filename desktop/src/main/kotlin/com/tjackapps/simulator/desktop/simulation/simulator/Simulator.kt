@@ -1,26 +1,23 @@
 package com.tjackapps.simulator.desktop.simulation.simulator
 
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.unit.dp
 import com.tjackapps.simulator.desktop.simulation.particles.ParticlesModel
 import com.tjackapps.simulator.desktop.simulation.particles.ParticlesState
 
 class Simulator {
 
     // Contains the necessary top level data to run the simulator
-    var simulatorModel by mutableStateOf(
+    private var simulatorModel by mutableStateOf(
         SimulatorModel(
             SimulatorState()
         )
     )
 
     // Contains all data related to particles in the simulator
-    var particlesModel by mutableStateOf(
+    private var particlesModel by mutableStateOf(
         ParticlesModel(
             ParticlesState()
         )
@@ -47,10 +44,6 @@ class Simulator {
     }
 
     private fun populateData(density: Density) {
-//        simulatorModel.updateSimulationSize(
-//            sizePixels = sizePixels,
-//        )
-
         particlesModel.populate(density)
     }
 
@@ -63,7 +56,7 @@ class Simulator {
 
     fun pauseSimulation() {
         simulatorModel.pauseSimulation()
-        println("pauSimulation Paused")
+        println("Simulation Paused")
     }
 
     fun resumeSimulation() {
@@ -83,9 +76,5 @@ class Simulator {
         if (status != SimulatorStatus.RUNNING) return
 
         particlesModel.next(timeElapsedMillis, density)
-    }
-
-    companion object {
-        const val DEFAULT_PIXELS_PER_MILLIMETER = 16f
     }
 }

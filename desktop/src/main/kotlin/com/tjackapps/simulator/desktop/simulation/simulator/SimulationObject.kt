@@ -11,19 +11,13 @@ sealed class SimulationObject {
     // how the object should be drawn on the canvas
     abstract fun draw(scope: DrawScope, scaleMultiplier: Float, color: Color)
 
-    /**
-     * width is always 1 millimeter
-     * height is always 1 millimeter
-     */
     data class Particle(
-        val width: Float, // pixels (16px at 1x scale multiplier by default?)
-        val height: Float, // pixels
-        // TODO particles shouldn't have mass, but magic energy should have some conversion for mass on impact with objects
-        // for now, mass will be included to help figure out formulas and get gravity working
-        val mass: Float, // grams
-        val position: Offset, // position on grid in meters (not pixels)
-        val velocity: Offset, // meters/second
-        val acceleration: Offset, // meters/second^2
+        val width: Float,
+        val height: Float,
+        val mass: Float,
+        val position: Offset,
+        val velocity: Offset,
+        val acceleration: Offset,
     ): SimulationObject() {
 
         override fun draw(
@@ -41,15 +35,25 @@ sealed class SimulationObject {
         }
 
         companion object {
-            fun create(density: Density): Particle {
+            fun create(
+                density: Density,
+                overrideDefault: Boolean = false,
+            ): Particle {
                 with(density) {
                     val w = 1200.dp.roundToPx()
                     val h = 800.dp.roundToPx()
 
-                    val position = Offset(
-                        (0..w).random().toFloat(),
-                        (0..h).random().toFloat()
-                    )
+                    val position = if (overrideDefault) {
+                        Offset(
+                            x = w / 2f,
+                            y = h / 2f,
+                        )
+                    } else {
+                        Offset(
+                            (0..w).random().toFloat(),
+                            (0..h).random().toFloat()
+                        )
+                    }
 
                     val velocity = Offset(
                         // First, randomize direction. Second, randomize magnitude of velocity.
@@ -65,10 +69,16 @@ sealed class SimulationObject {
                             .toFloat()
                     )
 
+                    val mass = if (overrideDefault) {
+                        10000f
+                    } else {
+                        (1..1000).random().toFloat()
+                    }
+
                     return Particle(
-                        width = 8f,
-                        height = 8f,
-                        mass = (1..10).random().toFloat(),
+                        width = 8f * mass / 100f,
+                        height = 8f * mass / 100f,
+                        mass = mass,
                         position = position,
                         velocity = velocity,
                         acceleration = Offset.Zero,
@@ -77,17 +87,15 @@ sealed class SimulationObject {
             }
 
             /**
-             * Calculate this [MagicParticle]'s distance to another one.
+             * Calculate this [Particle]'s distance to another one.
              */
             infix fun Particle.distanceTo(another: Particle): Float {
                 return (position - another.position).getDistance()
             }
 
             fun Particle.next(
-                borderss: IntSize,
                 durationMillis: Float,
-//                radius: Float,
-                netForcesToApply: Offset, // acceleration?
+                netForcesToApply: Offset,
                 multipliers: Multipliers,
                 density: Density,
             ): Particle {
@@ -95,15 +103,16 @@ sealed class SimulationObject {
                     IntSize(1200.dp.roundToPx(), 800.dp.roundToPx())
                 }
 
-                val speed = (velocity + netForcesToApply) * multipliers.speed
+                val speed = (velocity + netForcesToApply)
+                val speedMultiplied = speed * multipliers.speed
                 val radius = 8 * multipliers.scale
 
                 return Particle(
                     position = position + Offset(
-                        x = speed.x / 1000f * durationMillis,
-                        y = speed.y / 1000f * durationMillis,
+                        x = speedMultiplied.x / 1000f * durationMillis,
+                        y = speedMultiplied.y / 1000f * durationMillis,
                     ),
-                    velocity = velocity,
+                    velocity = speed,
                     acceleration = acceleration,
                     mass = mass,
                     width = width,

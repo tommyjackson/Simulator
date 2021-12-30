@@ -64,7 +64,7 @@ fun SimulatorWindow() {
                 SliderRow(
                     title = "Gravity Scale Factor",
                     value = config.multipliers.gravity,
-                    valueRange = 0.1f..10f,
+                    valueRange = 0f..20f,
                     onValueChanged = {
                         config = config.update(
                             gravity = it,

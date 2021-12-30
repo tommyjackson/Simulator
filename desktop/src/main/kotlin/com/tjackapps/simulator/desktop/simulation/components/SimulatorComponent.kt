@@ -25,12 +25,9 @@ fun BoxScope.SimulatorComponent(
     coroutineScope: CoroutineScope,
     scaleMultiplier: Float,
 ) {
-//    val scrollState = rememberScrollState()
 
     SimulatorCanvas(
         modifier = modifier,
-//            .horizontalScroll(scrollState)
-//            .verticalScroll(scrollState),
         simulator = simulator,
         coroutineScope = coroutineScope,
         scaleMultiplier = scaleMultiplier,
@@ -69,10 +66,6 @@ fun SimulatorCanvas(
             .height(800.dp),
     ) {
         simulator.simulationObjects.forEach {
-            val px = (it as SimulationObject.Particle).position.x
-            val py = (it as SimulationObject.Particle).position.y
-            val vx = (it as SimulationObject.Particle).velocity.x
-            val vy = (it as SimulationObject.Particle).velocity.y
             it.draw(this, scaleMultiplier, particleColor)
         }
     }
