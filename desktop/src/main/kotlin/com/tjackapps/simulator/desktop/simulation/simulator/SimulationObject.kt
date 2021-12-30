@@ -1,12 +1,9 @@
 package com.tjackapps.simulator.desktop.simulation.simulator
 
-import androidx.compose.material.MaterialTheme
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.unit.IntSize
-import com.tjackapps.simulator.desktop.simulation.game.SimulatorGameObject.MagicParticle
 
 sealed class SimulationObject {
     // how the object should be drawn on the canvas
@@ -78,7 +75,7 @@ sealed class SimulationObject {
             /**
              * Calculate this [MagicParticle]'s distance to another one.
              */
-            infix fun MagicParticle.distanceTo(another: MagicParticle): Float {
+            infix fun Particle.distanceTo(another: Particle): Float {
                 return (position - another.position).getDistance()
             }
 
